@@ -1,13 +1,10 @@
 from kivy.app import App
 from kivy.lang import Builder
-#from telas import *
-#from botoes import *
 from kivy.uix.screenmanager import Screen
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.button import ButtonBehavior
 import os
-#from bannersistema import BannerSistema
 from functools import partial
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -34,11 +31,6 @@ class BannerSistema(GridLayout):
     def __init__(self, **kwargs):
         super().__init__()
         self.cols = 3
-
-        #with self.canvas:
-        #    Color(rgb=(0, 0.145098039,	0.250980392, 1))
-        #    self.rec = Rectangle(size=self.size, pos=self.pos)
-        #self.bind(pos=self.atualizar_rec, size=self.atualizar_rec)
         
         imagem = kwargs['imagem']
         label = (kwargs['label'])
@@ -46,7 +38,7 @@ class BannerSistema(GridLayout):
 
         baner = FloatLayout()
         baner_imagem = ImageButton(pos_hint={'right': 1, 'top': 0.85}, size_hint=(1, 0.65), 
-                             source=f'icones/{imagem}', on_release=partial(meu_aplicativo.selecionar_sistema, imagem))
+                             source=f'appanalisefalhas/icones/{imagem}', on_release=partial(meu_aplicativo.selecionar_sistema, imagem))
         baner_label = LabelButton(text=label, pos_hint={'right': 1, 'top': 0.15}, size_hint=(1, 0.15), 
                                   on_release=partial(meu_aplicativo.selecionar_sistema, imagem))
 
@@ -54,10 +46,6 @@ class BannerSistema(GridLayout):
         baner.add_widget(baner_label)
 
         self.add_widget(baner)
-
-    #def atualizar_rec(self, *args):
-    #    self.rec.pos = self.pos
-    #    self.rec.size = self.size
 
 class BannerSelecionar(GridLayout):
     def __init__(self, **kwargs):
@@ -70,7 +58,6 @@ class BannerSelecionar(GridLayout):
             self.rec = Rectangle(size=self.size, pos=self.pos)
         self.bind(pos=self.atualizar_rec, size=self.atualizar_rec)
 
-        
         codigo = kwargs['codigo']
 
         meu_aplicativo = App.get_running_app()
@@ -80,7 +67,6 @@ class BannerSelecionar(GridLayout):
                                   on_release=partial(meu_aplicativo.preencher_codigo, codigo))
 
         banner.add_widget(baner_label)
-
         self.add_widget(banner)
 
     def atualizar_rec(self, *args):
@@ -89,7 +75,6 @@ class BannerSelecionar(GridLayout):
 
 GUI = Builder.load_file('main.kv')
 
-
 class MainApp(App):
     
     def build(self):
@@ -97,64 +82,50 @@ class MainApp(App):
     
     def on_start(self):
         #carregar lista sistema
-        icones = os.listdir('icones')
-        
-        
+        icones = os.listdir('appanalisefalhas/icones')
         for foto_icones in icones:
             imagem = foto_icones
-            label = foto_icones.replace('.png', '')
-        #    print(imagem)
-        #    print(label)  
+            label = foto_icones.replace('.png', '')  
             banner = BannerSistema(imagem=imagem, label=label)
             pagina_icones = self.root.ids['sistemapage']
             lista_icones = pagina_icones.ids['scroolview_sistema']
             lista_icones.add_widget(banner) 
 
-
     def buscar_sistema(self, *args):
-        #lista_codigos = ''
-        #alterar imagem selecionar page
         pagina_sistema = self.root.ids['sistemapage']
         imagem_sistema = pagina_sistema.ids['sistema_selecionado']
         texto_png = imagem_sistema.text
         if texto_png == '':
             pagina_selecionar = self.root.ids['selecionarpage']
             imagem_selecionar = pagina_selecionar.ids['imagem_selecionar']
-            imagem_selecionar.source = f'icones2/images.png'
+            imagem_selecionar.source = f'appanalisefalhas/icones2/images.png'
             pagina_sistema = self.root.ids['sistemapage']
             label_sistema = pagina_sistema.ids['sistema_selecionado']
             label_sistema.text= 'SELECIONE UM SISTEMA!!!'
             pagina_selecionar.ids['label_sistema_selecionado'].text= 'SELECIONE UM SISTEMA!!!'
-            
         else:
-
             texto_png = texto_png + '.png'
             #icones = os.listdir('icones')
             pagina_selecionar = self.root.ids['selecionarpage']
             imagem_selecionar = pagina_selecionar.ids['imagem_selecionar']
-            imagem_selecionar.source = f'icones/{texto_png}'
+            imagem_selecionar.source = f'appanalisefalhas/icones/{texto_png}'
         
-
-            arquivos = os.listdir('arquivos')
+            arquivos = os.listdir('appanalisefalhas/arquivos')
             pagina_sistema = self.root.ids['sistemapage']
             label_sistema = pagina_sistema.ids['sistema_selecionado']
             imagem = label_sistema.text
             imagem = imagem + '.xlsm'
             for arquivo in arquivos:
                 if arquivo == imagem:
-                    df_arquivo = pd.read_excel(f'arquivos/{arquivo}')
+                    df_arquivo = pd.read_excel(f'appanalisefalhas/arquivos/{arquivo}')
                     lista_codigos = df_arquivo['CÓDIGO'].astype(str)
                     pagina_selecionar = self.root.ids['selecionarpage']
                     lista_cod_selecionar = pagina_selecionar.ids['scroolview_selecionar']
-                    #apagar itens anteriores
                     for item in list(lista_cod_selecionar.children):
                         lista_cod_selecionar.remove_widget(item)
-                    #refazer lista
                     for item in lista_codigos:
                         codigo = item  
                         banner = BannerSelecionar(codigo=codigo)
-                        #pagina_selecionar = self.root.ids['selecionarpage']
-                        #lista_cod_selecionar = pagina_selecionar.ids['scroolview_selecionar']
                         lista_cod_selecionar.add_widget(banner)
         time.sleep(1)
         texto_input = pagina_selecionar.ids['codigo_input']
@@ -177,9 +148,6 @@ class MainApp(App):
         label_descricao = pagina_selecionar.ids['descricao']
         label_descricao.text = 'Descrição da Falha'
 
-        #pagina_sistema = self.root.ids['sistemapage']
-        #label_sistema = pagina_sistema.ids['sistema_selecionado']
-        #sistema = label_sistema.text
         pagina_selecionar = self.root.ids['selecionarpage']
         if text:
             texto = text
@@ -192,7 +160,6 @@ class MainApp(App):
             label_componente.text = f'[color=#FF0000]Código Inválido[/color]'
             label_descricao.text = f'[color=#FF0000]Digite um Código Válido[/color]'
 
-
     def buscar_dados(self, *args):
         codigo = ''
         pagina_selecionar = self.root.ids['selecionarpage']
@@ -204,7 +171,7 @@ class MainApp(App):
         label_codigo = pagina_selecionar.ids['codigo_escolhido']
         label_descricao = pagina_selecionar.ids['descricao']
         codigo = label_codigo.text
-        df_arquivo = pd.read_excel(f'arquivos/{sistema}')
+        df_arquivo = pd.read_excel(f'appanalisefalhas/arquivos/{sistema}')
         label_componente = pagina_selecionar.ids['componente']
         label_descricao = pagina_selecionar.ids['descricao']
         try:
@@ -232,9 +199,7 @@ class MainApp(App):
                 label_descricao.text = f'[color=#000000]Selecione ou Digite um Código[/color]'
         except:
             pass
-        
-
-        
+           
     def mudar_tela(self, id_tela):
         gerenciador_telas = self.root.ids['screen_manager']
         gerenciador_telas.current = id_tela
@@ -259,6 +224,5 @@ class MainApp(App):
     def fechar_aplicativo(self):
         quit(code=exit)
     
-
 MainApp().run()
         
