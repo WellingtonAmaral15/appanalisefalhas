@@ -10,8 +10,8 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import Color, Rectangle
 import pandas as pd
-import openpyxl
-from kivy.uix.textinput import TextInput
+#import openpyxl
+#from kivy.uix.textinput import TextInput
 import time
 
 
@@ -222,7 +222,7 @@ class MainApp(App):
         label_selecionar = pagina_selecionar.ids['label_sistema_selecionado']
         label_selecionar.text = imagem_selecionada.replace('.png', '')
     def fechar_aplicativo(self):
-        quit(code=exit)
+        exit()
     
 MainApp().run()
         
